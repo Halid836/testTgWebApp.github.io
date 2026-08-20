@@ -20,6 +20,18 @@
   tg.onEvent('themechanged',function(){
     document.body.style.backgroundColor= tg.themeParams.bg_color;
   });
+  
+  tg.MainButton.show();
+  tg.MainButton.setText("Заказать");
+  
+  tg.MainButton.setParams({
+    color : "red";
+    text-color :"darkred";
+    is_active :true;
+  });
+  tg.MainButton.onClick(function({
+    tg.showalert("Заказ отправлен");
+  });
   </script>
 </body>
 </html>
