@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
   <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
@@ -12,25 +11,30 @@
     Привет из TgWebApp
   </h1>
   <script>
-   let user = window.Telegram.WebApp.initDataUnsafe?.user;
+   let tg = window.Telegram.WebApp;
+   tg.ready();
+   tg.expand();
+   
+   let user = tg.initDataUnsafe?.user;
    if(user){
-     document.write("Имя:"+user.first_name);
+     document.write("Имя: " + user.first_name);
    }
   
-  tg.onEvent('themechanged',function(){
-    document.body.style.backgroundColor= tg.themeParams.bg_color;
+  tg.onEvent('themeChanged', function(){
+    document.body.style.backgroundColor = tg.themeParams.bg_color;
   });
   
   tg.MainButton.show();
   tg.MainButton.setText("Заказать");
   
   tg.MainButton.setParams({
-    color : "red";
-    text-color :"darkred";
-    is_active :true;
+    color: "red",
+    text_color: "darkred",
+    is_active: true
   });
-  tg.MainButton.onClick(function({
-    tg.showalert("Заказ отправлен");
+  
+  tg.MainButton.onClick(function(){
+    tg.showAlert("Заказ отправлен");
   });
   </script>
 </body>
