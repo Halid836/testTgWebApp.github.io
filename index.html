@@ -8,9 +8,37 @@
 </head>
 <body>
   <h1>
-Hello, World!
+Shop
   </h1>
-  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  <button id="btn">Заказать</button>
+  <script src="https://telegram.org/js/telegram-web-app.js?63">
+  //script
+  const tg = window.TelegramWebApp; //деталь1
+  
+  tg.ready; //открытие app.
+  
+  tg.expand(); //весь экран
+  
+  const user = tg.initData.user;
+  
+  if(user){
+    document.querySelecto('h1').textContent="Привет",user.first_name;
+  }
+  
+  Button
+  const btn = document.getElementById('btn');
+  btn.addEventListener('click',()=>{
+    tg.showAlert("Товар оформлен")
+  });
+  //MainButton
+  tg.MainButton.text="Pay";
+  tg.MainButton.show();
+  tg.MainButton.onclick(()=>{
+    tg.MainButton.hide();
+    tg.showAlert("Оплачено");
+  });
+  </script>
 </body>
 </html>
+
 
