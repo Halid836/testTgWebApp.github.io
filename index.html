@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🛍️ Мини-магазин</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--tg-theme-bg-color, #f5f5f5);
+      color: var(--tg-theme-text-color, #000000);
+      padding-bottom: 100px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .header {
+      background-color: var(--tg-theme-secondary-bg-color, #ffffff);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .header p {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+    }
+    
+    .products {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .product-card {
+      background-color: var(--tg-theme-secondary-bg-color, #ffffff);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    
+    .product-card:active {
+      transform: scale(0.95);
+    }
+    
+    .product-emoji {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .product-name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .product-price {
+      font-size: 18px;
+      color: var(--tg-theme-button-color, #007aff);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .add-btn {
+      background-color: var(--tg-theme-button-color, #007aff);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .add-btn:active {
+      opacity: 0.7;
+    }
+    
+    .cart-badge {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ff3b30;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background-color: var(--tg-theme-bg-color, #ffffff);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 70%;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--tg-theme-text-color, #000000);
+    }
+    
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .cart-item-info {
+      flex: 1;
+    }
+    
+    .cart-item-name {
+      font-weight: bold;
+    }
+    
+    .cart-item-price {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+    }
+    
+    .remove-btn {
+      background-color: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    
+    .total-section {
+      padding: 20px 0;
+      text-align: center;
+    }
+    
+    .total-price {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--tg-theme-button-color, #007aff);
+    }
+    
+    .payment-methods {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .payment-btn {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid var(--tg-theme-button-color, #007aff);
+      border-radius: 12px;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    
+    .payment-btn.active {
+      background-color: var(--tg-theme-button-color, #007aff);
+      color: var(--tg-theme-button-text-color, #ffffff);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🛍️ Мини-магазин</h1>
+    <p id="greeting">Добро пожаловать!</p>
+  </div>
+  
+  <div class="cart-badge" id="cart-badge" onclick="openCart()">0</div>
+  
+  <div class="products" id="products-container">
+    <!-- Товары появятся тут -->
+  </div>
+  
+  <!-- Модальное окно корзины -->
+  <div class="modal" id="cart-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛒 Корзина</h2>
+        <button class="close-btn" onclick="closeCart()">✕</button>
+      </div>
+      <div id="cart-items">
+        <!-- Товары корзины -->
+      </div>
+      <div class="total-section">
+        <p>Итого:</p>
+        <div class="total-price" id="total-price">0₽</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  
+  <script>
+    let tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    
+    let biometricReady = false;
+    
+    // Инициализация биометрии
+    initBiometric();
+    
+    function initBiometric() {
+      tg.BiometricManager.isBiometricAvailable(function(available) {
+        if (available) {
+          tg.BiometricManager.initBiometric(function(success) {
+            if (success) {
+              biometricReady = true;
+              console.log('Биометрия готова');
+            }
+          });
+        }
+      });
+    }
+    
+    // Приветствие
+    let user = tg.initDataUnsafe?.user;
+    if (user) {
+      document.getElementById('greeting').innerText = 'Добро пожаловать, ' + user.first_name + '!';
+    }
+    
+    // Товары
+    let products = [
+      { id: 1, name: "Кофе Латте", price: 150, emoji: "☕" },
+      { id: 2, name: "Круассан", price: 120, emoji: "🥐" },
+      { id: 3, name: "Сэндвич", price: 250, emoji: "🥪" },
+      { id: 4, name: "Сок", price: 100, emoji: "🧃" },
+      { id: 5, name: "Пицца", price: 450, emoji: "🍕" },
+      { id: 6, name: "Салат", price: 200, emoji: "🥗" },
+      { id: 7, name: "Чизкейк", price: 180, emoji: "🍰" },
+      { id: 8, name: "Чай", price: 80, emoji: "🍵" }
+    ];
+    
+    let cart = [];
+    
+    // Отрисовка товаров
+    function renderProducts() {
+      let container = document.getElementById('products-container');
+      container.innerHTML = '';
+      
+      products.forEach(function(product) {
+        let card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <div class="product-emoji">${product.emoji}</div>
+          <div class="product-name">${product.name}</div>
+          <div class="product-price">${product.price}₽</div>
+          <button class="add-btn" onclick="addToCart(${product.id})">Добавить</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Добавление в корзину
+    function addToCart(productId) {
+      let product = products.find(function(p) {
+        return p.id === productId;
+      });
+      
+      cart.push(product);
+      updateCart();
+      
+      tg.HapticFeedback.impactOccurred('light');
+      tg.showPopup({
+        title: '✅ Добавлено',
+        message: product.name + ' в корзине!',
+        buttons: [{ type: 'ok', text: 'Отлично' }]
+      });
+    }
+    
+    // Удаление из корзины
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCart();
+      renderCart();
+      tg.HapticFeedback.impactOccurred('light');
+    }
+    
+    // Обновление корзины
+    function updateCart() {
+      let badge = document.getElementById('cart-badge');
+      badge.innerText = cart.length;
+      badge.style.display = cart.length > 0 ? 'flex' : 'none';
+    }
+    
+    // Открытие корзины
+    function openCart() {
+      document.getElementById('cart-modal').style.display = 'block';
+      renderCart();
+    }
+    
+    // Закрытие корзины
+    function closeCart() {
+      document.getElementById('cart-modal').style.display = 'none';
+    }
+    
+    // Отрисовка корзины
+    function renderCart() {
+      let container = document.getElementById('cart-items');
+      container.innerHTML = '';
+      
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:20px;">Корзина пуста</p>';
+        document.getElementById('total-price').innerText = '0₽';
+        return;
+      }
+      
+      cart.forEach(function(item, index) {
+        let div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.emoji} ${item.name}</div>
+            <div class="cart-item-price">${item.price}₽</div>
+          </div>
+          <button class="remove-btn" onclick="removeFromCart(${index})">Удалить</button>
+        `;
+        container.appendChild(div);
+      });
+      
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      document.getElementById('total-price').innerText = total + '₽';
+    }
+    
+    // Оплата через биометрию
+    function payWithBiometric() {
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      if (!biometricReady) {
+        tg.showAlert('Биометрия недоступна. Попробуйте обычную оплату.');
+        return;
+      }
+      
+      tg.BiometricManager.requestAccess({
+        reason: 'Для подтверждения оплаты ' + total + '₽',
+        callback: function(granted) {
+          if (granted) {
+            tg.BiometricManager.authenticate({
+              reason: 'Оплата ' + total + '₽',
+              callback: function(success) {
+                if (success) {
+                  completeOrder('biometric');
+                } else {
+                  tg.HapticFeedback.notificationOccurred('error');
+                  tg.showAlert('❌ Оплата отменена');
+                }
+              }
+            });
+          } else {
+            tg.showAlert('Доступ к биометрии запрещён');
+          }
+        }
+      });
+    }
+    
+    // Обычная оплата
+    function payNormal() {
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      tg.showConfirm('Оплатить ' + total + '₽?', function(ok) {
+        if (ok) {
+          completeOrder('normal');
+        }
+      });
+    }
+    
+    // Завершение заказа
+    function completeOrder(paymentMethod) {
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      tg.MainButton.showProgress();
+      
+      setTimeout(function() {
+        tg.MainButton.hideProgress();
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        // Отправка заказа боту
+        tg.sendData(JSON.stringify({
+          action: 'order',
+          items: cart,
+          total: total,
+          payment_method: paymentMethod,
+          user: user?.id
+        }));
+        
+        tg.showAlert('✅ Заказ оформлен! Оплата через ' + 
+          (paymentMethod === 'biometric' ? 'биометрию' : 'обычный способ'));
+        
+        cart = [];
+        updateCart();
+        closeCart();
+      }, 2000);
+    }
+    
+    // Настройка MainButton
+    tg.MainButton.show();
+    tg.MainButton.setText('💳 Оплатить');
+    tg.MainButton.setParams({
+      color: '#ff6600',
+      text_color: '#ffffff',
+      is_active: true
+    });
+    
+    tg.MainButton.onClick(function() {
+      if (cart.length === 0) {
+        tg.showAlert('Корзина пуста! Добавьте товары.');
+        return;
+      }
+      
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      // Показываем выбор способа оплаты
+      tg.showPopup({
+        title: '💳 Оплата',
+        message: 'Сумма: ' + total + '₽\nВыберите способ оплаты:',
+        buttons: [
+          { id: 'biometric', type: 'ok', text: '🔒 Биометрия' },
+          { id: 'normal', type: 'default', text: '💵 Обычная оплата' },
+          { id: 'cancel', type: 'cancel', text: 'Отмена' }
+        ]
+      }, function(btnId) {
+        if (btnId === 'biometric') {
+          payWithBiometric();
+        } else if (btnId === 'normal') {
+          payNormal();
+        }
+      });
+    });
+    
+    // SecondaryButton для очистки
+    tg.SecondaryButton.show();
+    tg.SecondaryButton.setText('🧹 Очистить');
+    tg.SecondaryButton.setParams({
+      color: '#ff3b30',
+      text_color: '#ffffff',
+      is_active: true
+    });
+    
+    tg.SecondaryButton.onClick(function() {
+      if (cart.length === 0) {
+        tg.showAlert('Корзина уже пуста');
+        return;
+      }
+      
+      tg.showConfirm('Очистить корзину?', function(ok) {
+        if (ok) {
+          cart = [];
+          updateCart();
+          renderCart();
+          tg.showAlert('Корзина очищена');
+        }
+      });
+    });
+    
+    // SettingsButton
+    tg.SettingsButton.show();
+    tg.SettingsButton.onClick(function() {
+      tg.showPopup({
+        title: '⚙️ Информация',
+        message: 'Мини-магазин v1.0\nТоваров: ' + products.length + 
+                 '\nВ корзине: ' + cart.length +
+                 '\nБиометрия: ' + (biometricReady ? '✅' : '❌'),
+        buttons: [
+          { id: 'clear', type: 'destructive', text: 'Очистить корзину' },
+          { id: 'close', type: 'cancel', text: 'Закрыть' }
+        ]
+      }, function(btnId) {
+        if (btnId === 'clear') {
+          cart = [];
+          updateCart();
+          renderCart();
+          tg.showAlert('Корзина очищена');
+        }
+      });
+    });
+    
+    // Запуск
+    renderProducts();
+    updateCart();
+  </script>
+</body>
+</html> <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🛍️ Мини-магазин</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--tg-theme-bg-color, #f5f5f5);
+      color: var(--tg-theme-text-color, #000000);
+      padding-bottom: 100px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .header {
+      background-color: var(--tg-theme-secondary-bg-color, #ffffff);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .header p {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+    }
+    
+    .products {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .product-card {
+      background-color: var(--tg-theme-secondary-bg-color, #ffffff);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    
+    .product-card:active {
+      transform: scale(0.95);
+    }
+    
+    .product-emoji {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .product-name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .product-price {
+      font-size: 18px;
+      color: var(--tg-theme-button-color, #007aff);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .add-btn {
+      background-color: var(--tg-theme-button-color, #007aff);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .add-btn:active {
+      opacity: 0.7;
+    }
+    
+    .cart-badge {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ff3b30;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background-color: var(--tg-theme-bg-color, #ffffff);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 70%;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--tg-theme-text-color, #000000);
+    }
+    
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .cart-item-info {
+      flex: 1;
+    }
+    
+    .cart-item-name {
+      font-weight: bold;
+    }
+    
+    .cart-item-price {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+    }
+    
+    .remove-btn {
+      background-color: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    
+    .total-section {
+      padding: 20px 0;
+      text-align: center;
+    }
+    
+    .total-price {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--tg-theme-button-color, #007aff);
+    }
+    
+    .payment-methods {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .payment-btn {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid var(--tg-theme-button-color, #007aff);
+      border-radius: 12px;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    
+    .payment-btn.active {
+      background-color: var(--tg-theme-button-color, #007aff);
+      color: var(--tg-theme-button-text-color, #ffffff);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🛍️ Мини-магазин</h1>
+    <p id="greeting">Добро пожаловать!</p>
+  </div>
+  
+  <div class="cart-badge" id="cart-badge" onclick="openCart()">0</div>
+  
+  <div class="products" id="products-container">
+    <!-- Товары появятся тут -->
+  </div>
+  
+  <!-- Модальное окно корзины -->
+  <div class="modal" id="cart-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛒 Корзина</h2>
+        <button class="close-btn" onclick="closeCart()">✕</button>
+      </div>
+      <div id="cart-items">
+        <!-- Товары корзины -->
+      </div>
+      <div class="total-section">
+        <p>Итого:</p>
+        <div class="total-price" id="total-price">0₽</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  
+  <script>
+    let tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    
+    let biometricReady = false;
+    
+    // Инициализация биометрии
+    initBiometric();
+    
+    function initBiometric() {
+      tg.BiometricManager.isBiometricAvailable(function(available) {
+        if (available) {
+          tg.BiometricManager.initBiometric(function(success) {
+            if (success) {
+              biometricReady = true;
+              console.log('Биометрия готова');
+            }
+          });
+        }
+      });
+    }
+    
+    // Приветствие
+    let user = tg.initDataUnsafe?.user;
+    if (user) {
+      document.getElementById('greeting').innerText = 'Добро пожаловать, ' + user.first_name + '!';
+    }
+    
+    // Товары
+    let products = [
+      { id: 1, name: "Кофе Латте", price: 150, emoji: "☕" },
+      { id: 2, name: "Круассан", price: 120, emoji: "🥐" },
+      { id: 3, name: "Сэндвич", price: 250, emoji: "🥪" },
+      { id: 4, name: "Сок", price: 100, emoji: "🧃" },
+      { id: 5, name: "Пицца", price: 450, emoji: "🍕" },
+      { id: 6, name: "Салат", price: 200, emoji: "🥗" },
+      { id: 7, name: "Чизкейк", price: 180, emoji: "🍰" },
+      { id: 8, name: "Чай", price: 80, emoji: "🍵" }
+    ];
+    
+    let cart = [];
+    
+    // Отрисовка товаров
+    function renderProducts() {
+      let container = document.getElementById('products-container');
+      container.innerHTML = '';
+      
+      products.forEach(function(product) {
+        let card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <div class="product-emoji">${product.emoji}</div>
+          <div class="product-name">${product.name}</div>
+          <div class="product-price">${product.price}₽</div>
+          <button class="add-btn" onclick="addToCart(${product.id})">Добавить</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Добавление в корзину
+    function addToCart(productId) {
+      let product = products.find(function(p) {
+        return p.id === productId;
+      });
+      
+      cart.push(product);
+      updateCart();
+      
+      tg.HapticFeedback.impactOccurred('light');
+      tg.showPopup({
+        title: '✅ Добавлено',
+        message: product.name + ' в корзине!',
+        buttons: [{ type: 'ok', text: 'Отлично' }]
+      });
+    }
+    
+    // Удаление из корзины
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCart();
+      renderCart();
+      tg.HapticFeedback.impactOccurred('light');
+    }
+    
+    // Обновление корзины
+    function updateCart() {
+      let badge = document.getElementById('cart-badge');
+      badge.innerText = cart.length;
+      badge.style.display = cart.length > 0 ? 'flex' : 'none';
+    }
+    
+    // Открытие корзины
+    function openCart() {
+      document.getElementById('cart-modal').style.display = 'block';
+      renderCart();
+    }
+    
+    // Закрытие корзины
+    function closeCart() {
+      document.getElementById('cart-modal').style.display = 'none';
+    }
+    
+    // Отрисовка корзины
+    function renderCart() {
+      let container = document.getElementById('cart-items');
+      container.innerHTML = '';
+      
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:20px;">Корзина пуста</p>';
+        document.getElementById('total-price').innerText = '0₽';
+        return;
+      }
+      
+      cart.forEach(function(item, index) {
+        let div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.emoji} ${item.name}</div>
+            <div class="cart-item-price">${item.price}₽</div>
+          </div>
+          <button class="remove-btn" onclick="removeFromCart(${index})">Удалить</button>
+        `;
+        container.appendChild(div);
+      });
+      
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      document.getElementById('total-price').innerText = total + '₽';
+    }
+    
+    // Оплата через биометрию
+    function payWithBiometric() {
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      if (!biometricReady) {
+        tg.showAlert('Биометрия недоступна. Попробуйте обычную оплату.');
+        return;
+      }
+      
+      tg.BiometricManager.requestAccess({
+        reason: 'Для подтверждения оплаты ' + total + '₽',
+        callback: function(granted) {
+          if (granted) {
+            tg.BiometricManager.authenticate({
+              reason: 'Оплата ' + total + '₽',
+              callback: function(success) {
+                if (success) {
+                  completeOrder('biometric');
+                } else {
+                  tg.HapticFeedback.notificationOccurred('error');
+                  tg.showAlert('❌ Оплата отменена');
+                }
+              }
+            });
+          } else {
+            tg.showAlert('Доступ к биометрии запрещён');
+          }
+        }
+      });
+    }
+    
+    // Обычная оплата
+    function payNormal() {
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      tg.showConfirm('Оплатить ' + total + '₽?', function(ok) {
+        if (ok) {
+          completeOrder('normal');
+        }
+      });
+    }
+    
+    // Завершение заказа
+    function completeOrder(paymentMethod) {
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      tg.MainButton.showProgress();
+      
+      setTimeout(function() {
+        tg.MainButton.hideProgress();
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        // Отправка заказа боту
+        tg.sendData(JSON.stringify({
+          action: 'order',
+          items: cart,
+          total: total,
+          payment_method: paymentMethod,
+          user: user?.id
+        }));
+        
+        tg.showAlert('✅ Заказ оформлен! Оплата через ' + 
+          (paymentMethod === 'biometric' ? 'биометрию' : 'обычный способ'));
+        
+        cart = [];
+        updateCart();
+        closeCart();
+      }, 2000);
+    }
+    
+    // Настройка MainButton
+    tg.MainButton.show();
+    tg.MainButton.setText('💳 Оплатить');
+    tg.MainButton.setParams({
+      color: '#ff6600',
+      text_color: '#ffffff',
+      is_active: true
+    });
+    
+    tg.MainButton.onClick(function() {
+      if (cart.length === 0) {
+        tg.showAlert('Корзина пуста! Добавьте товары.');
+        return;
+      }
+      
+      let total = cart.reduce(function(sum, item) {
+        return sum + item.price;
+      }, 0);
+      
+      // Показываем выбор способа оплаты
+      tg.showPopup({
+        title: '💳 Оплата',
+        message: 'Сумма: ' + total + '₽\nВыберите способ оплаты:',
+        buttons: [
+          { id: 'biometric', type: 'ok', text: '🔒 Биометрия' },
+          { id: 'normal', type: 'default', text: '💵 Обычная оплата' },
+          { id: 'cancel', type: 'cancel', text: 'Отмена' }
+        ]
+      }, function(btnId) {
+        if (btnId === 'biometric') {
+          payWithBiometric();
+        } else if (btnId === 'normal') {
+          payNormal();
+        }
+      });
+    });
+    
+    // SecondaryButton для очистки
+    tg.SecondaryButton.show();
+    tg.SecondaryButton.setText('🧹 Очистить');
+    tg.SecondaryButton.setParams({
+      color: '#ff3b30',
+      text_color: '#ffffff',
+      is_active: true
+    });
+    
+    tg.SecondaryButton.onClick(function() {
+      if (cart.length === 0) {
+        tg.showAlert('Корзина уже пуста');
+        return;
+      }
+      
+      tg.showConfirm('Очистить корзину?', function(ok) {
+        if (ok) {
+          cart = [];
+          updateCart();
+          renderCart();
+          tg.showAlert('Корзина очищена');
+        }
+      });
+    });
+    
+    // SettingsButton
+    tg.SettingsButton.show();
+    tg.SettingsButton.onClick(function() {
+      tg.showPopup({
+        title: '⚙️ Информация',
+        message: 'Мини-магазин v1.0\nТоваров: ' + products.length + 
+                 '\nВ корзине: ' + cart.length +
+                 '\nБиометрия: ' + (biometricReady ? '✅' : '❌'),
+        buttons: [
+          { id: 'clear', type: 'destructive', text: 'Очистить корзину' },
+          { id: 'close', type: 'cancel', text: 'Закрыть' }
+        ]
+      }, function(btnId) {
+        if (btnId === 'clear') {
+          cart = [];
+          updateCart();
+          renderCart();
+          tg.showAlert('Корзина очищена');
+        }
+      });
+    });
+    
+    // Запуск
+    renderProducts();
+    updateCart();
+  </script>
+</body>
+</html>
