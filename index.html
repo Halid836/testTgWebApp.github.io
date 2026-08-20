@@ -1,43 +1,44 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="styles/style.css"/>
-  <title>Hello, World!</title>
+  <title>Shop</title>
 </head>
 <body>
-  <h1>
-Shop
-  </h1>
-  <button id="btn">Заказать</button>
-  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  <h1>Shop</h1>
+  <button id="btn" style="padding: 15px 30px; font-size: 18px;">Заказать</button>
+  
+  <div id="debug" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
   <script>
-  const tg = window.Telegram.WebApp;
-  
-  tg.ready();
-  
-  tg.expand();
-  
-  const user = tg.initDataUnsafe?.user;
-  
-  if(user){
-    document.querySelector('h1').textContent = "Привет, " + user.first_name;
-  }
-  
-  const btn = document.getElementById('btn');
-  btn.addEventListener('click', () => {
-    tg.showAlert("Товар оформлен");
-  });
-  
-  tg.MainButton.text = "Pay";
-  tg.MainButton.show();
-  tg.MainButton.onClick(() => {
-    tg.MainButton.hide();
-    tg.showAlert("Оплачено");
-  });
+    const debug = document.getElementById('debug');
+    const tg = window.Telegram.WebApp;
+    
+    debug.innerHTML = 'Скрипт выполняется...<br>';
+    debug.innerHTML += 'tg: ' + (tg ? 'Есть' : 'Нет') + '<br>';
+    
+    tg.ready();
+    tg.expand();
+    
+    debug.innerHTML += 'MainButton: ' + (tg.MainButton ? 'Есть' : 'Нет') + '<br>';
+    
+    // Кнопка Заказать
+    document.getElementById('btn').onclick = function() {
+      debug.innerHTML += 'Кнопка нажата!<br>';
+      tg.showAlert('Товар оформлен');
+    };
+    
+    // MainButton
+    tg.MainButton.text = 'PAY';
+    tg.MainButton.show();
+    debug.innerHTML += 'MainButton показана<br>';
+    
+    tg.MainButton.onClick(function() {
+      tg.showAlert('Оплачено');
+    });
   </script>
 </body>
 </html>
