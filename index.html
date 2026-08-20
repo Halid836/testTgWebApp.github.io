@@ -16,6 +16,10 @@
    if(user){
      document.write("Имя:"+user.first_name);
    }
+  
+  tg.onEvent('themechanged',function(){
+    document.body.style.backgroundColor= tg.themeParams.bg_color;
+  });
   </script>
 </body>
 </html>
