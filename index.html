@@ -1,24 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="styles/style.css"/>
   <title>TgWebApp</title>
 </head>
 <body>
   <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
-  <h1>Тест кнопки</h1>
-  
+  <h1>
+    Привет из TgWebApp
+  </h1>
   <script>
-    let tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-    
-    tg.MainButton.show();
-    tg.MainButton.setText("ЗАКАЗАТЬ");
-    
-    tg.MainButton.onClick(function(){
-      tg.showAlert("Работает!");
-    });
+   let tg = window.Telegram.WebApp;
+   tg.ready();
+   tg.expand();
+   
+   let user = tg.initDataUnsafe?.user;
+   if(user){
+     document.write("Имя: " + user.first_name);
+   }
+  
+  tg.onEvent('themeChanged', function(){
+    document.body.style.backgroundColor = tg.themeParams.bg_color;
+  });
+  
+  tg.MainButton.show();
+  tg.MainButton.setText("Заказать");
+  
+  tg.MainButton.setParams({
+    color: "red",
+    text_color: "darkred",
+    is_active: true
+  });
+  
+  tg.MainButton.onClick(function(){
+    tg.showAlert("Заказ отправлен");
+  });
   </script>
 </body>
 </html>
