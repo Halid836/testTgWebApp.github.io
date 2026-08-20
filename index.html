@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🛍️ Магазин</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+    
+    /* Профиль */
+    .profile {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #007aff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .user-info {
+      flex: 1;
+    }
+    
+    .user-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .user-id {
+      font-size: 14px;
+      color: #666;
+      margin-top: 2px;
+    }
+    
+    .user-status {
+      font-size: 12px;
+      color: #34c759;
+      margin-top: 2px;
+    }
+    
+    /* Заголовок магазина */
+    .shop-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Товары */
+    .products {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    
+    .product {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    
+    .product:active {
+      transform: scale(0.95);
+    }
+    
+    .product-emoji {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+    
+    .product-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .product-price {
+      font-size: 16px;
+      color: #007aff;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .add-btn {
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      width: 100%;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .add-btn:active {
+      opacity: 0.7;
+    }
+    
+    /* Корзина */
+    .cart-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ff3b30;
+      color: white;
+      border-radius: 50%;
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(255,59,48,0.4);
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .cart-badge:active {
+      transform: scale(0.9);
+    }
+    
+    /* Модалка корзины */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .close-btn {
+      font-size: 28px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+    }
+    
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    
+    .cart-item-info {
+      flex: 1;
+    }
+    
+    .cart-item-name {
+      font-weight: 600;
+    }
+    
+    .cart-item-price {
+      color: #666;
+      font-size: 13px;
+    }
+    
+    .remove-btn {
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .total {
+      text-align: center;
+      padding: 15px 0 5px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #007aff;
+      border-top: 2px solid #eee;
+      margin-top: 10px;
+    }
+    
+    .empty-cart {
+      text-align: center;
+      padding: 30px;
+      color: #999;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Профиль пользователя -->
+  <div class="profile" id="profile">
+    <div class="avatar" id="avatar">👤</div>
+    <div class="user-info">
+      <div class="user-name" id="userName">Загрузка...</div>
+      <div class="user-id" id="userId">ID: ---</div>
+      <div class="user-status" id="userStatus">🟢 В сети</div>
+    </div>
+  </div>
+
+  <!-- Заголовок магазина -->
+  <div class="shop-title">
+    🛍️ Магазин
+  </div>
+
+  <!-- Товары -->
+  <div class="products" id="products"></div>
+
+  <!-- Корзина -->
+  <div class="cart-badge" id="cartBadge" onclick="openCart()">
+    0
+  </div>
+
+  <!-- Модалка корзины -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛒 Корзина</h2>
+        <button class="close-btn" onclick="closeCart()">✕</button>
+      </div>
+      <div id="cartItems">
+        <div class="empty-cart">Корзина пуста</div>
+      </div>
+      <div class="total" id="totalPrice">Итого: 0₽</div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  
+  <script>
+    // Инициализация Telegram
+    let tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    
+    // Получаем данные пользователя
+    let user = tg.initDataUnsafe?.user;
+    
+    // Показываем профиль
+    function showProfile() {
+      if (user) {
+        document.getElementById('userName').textContent = user.first_name || 'Пользователь';
+        document.getElementById('userId').textContent = 'ID: ' + (user.id || '---');
+        
+        // Аватарка (первая буква имени)
+        let firstLetter = (user.first_name || 'П')[0].toUpperCase();
+        document.getElementById('avatar').textContent = firstLetter;
+        
+        // Если есть username
+        if (user.username) {
+          document.getElementById('userName').textContent += ' @' + user.username;
+        }
+      } else {
+        document.getElementById('userName').textContent = 'Гость';
+        document.getElementById('userId').textContent = 'ID: не авторизован';
+      }
+    }
+    
+    // Товары
+    let products = [
+      { id: 1, name: 'Кофе', price: 150, emoji: '☕' },
+      { id: 2, name: 'Круассан', price: 120, emoji: '🥐' },
+      { id: 3, name: 'Сэндвич', price: 250, emoji: '🥪' },
+      { id: 4, name: 'Сок', price: 100, emoji: '🧃' },
+      { id: 5, name: 'Пицца', price: 450, emoji: '🍕' },
+      { id: 6, name: 'Салат', price: 200, emoji: '🥗' },
+      { id: 7, name: 'Чизкейк', price: 180, emoji: '🍰' },
+      { id: 8, name: 'Чай', price: 80, emoji: '🍵' }
+    ];
+    
+    let cart = [];
+    
+    // Отображение товаров
+    function renderProducts() {
+      let container = document.getElementById('products');
+      container.innerHTML = '';
+      
+      products.forEach(product => {
+        let div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <div class="product-emoji">${product.emoji}</div>
+          <div class="product-name">${product.name}</div>
+          <div class="product-price">${product.price}₽</div>
+          <button class="add-btn" onclick="addToCart(${product.id})">➕ Добавить</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+    
+    // Добавление в корзину
+    function addToCart(productId) {
+      let product = products.find(p => p.id === productId);
+      if (!product) return;
+      
+      cart.push({...product});
+      updateCartBadge();
+      
+      // Тактильная отдача
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+      
+      // Уведомление
+      if (tg.showAlert) {
+        tg.showAlert('✅ ' + product.name + ' добавлен');
+      }
+    }
+    
+    // Удаление из корзины
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartBadge();
+      renderCart();
+    }
+    
+    // Обновление значка корзины
+    function updateCartBadge() {
+      document.getElementById('cartBadge').textContent = cart.length;
+    }
+    
+    // Открытие корзины
+    function openCart() {
+      document.getElementById('cartModal').style.display = 'block';
+      renderCart();
+    }
+    
+    // Закрытие корзины
+    function closeCart() {
+      document.getElementById('cartModal').style.display = 'none';
+    }
+    
+    // Отображение корзины
+    function renderCart() {
+      let container = document.getElementById('cartItems');
+      
+      if (cart.length === 0) {
+        container.innerHTML = '<div class="empty-cart">🛒 Корзина пуста</div>';
+        document.getElementById('totalPrice').textContent = 'Итого: 0₽';
+        return;
+      }
+      
+      let html = '';
+      let total = 0;
+      
+      cart.forEach((item, index) => {
+        total += item.price;
+        html += `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.emoji} ${item.name}</div>
+              <div class="cart-item-price">${item.price}₽</div>
+            </div>
+            <button class="remove-btn" onclick="removeFromCart(${index})">✕</button>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+      document.getElementById('totalPrice').textContent = 'Итого: ' + total + '₽';
+    }
+    
+    // Инициализация
+    showProfile();
+    renderProducts();
+    updateCartBadge();
+    
+    // Кнопка оформления заказа (MainButton)
+    if (tg.MainButton) {
+      tg.MainButton.show();
+      tg.MainButton.setText('💳 ОФОРМИТЬ ЗАКАЗ');
+      tg.MainButton.onClick(function() {
+        if (cart.length === 0) {
+          tg.showAlert('Корзина пуста!');
+          return;
+        }
+        
+        let total = cart.reduce((sum, item) => sum + item.price, 0);
+        tg.showConfirm('Оформить заказ на ' + total + '₽?', function(ok) {
+          if (ok) {
+            tg.sendData(JSON.stringify({
+              action: 'order',
+              items: cart,
+              total: total,
+              user: user
+            }));
+            
+            tg.showAlert('✅ Заказ оформлен!');
+            cart = [];
+            updateCartBadge();
+            closeCart();
+          }
+        });
+      });
+    }
+    
+    // Вторая кнопка - очистка корзины
+    if (tg.SecondaryButton) {
+      tg.SecondaryButton.show();
+      tg.SecondaryButton.setText('🧹 ОЧИСТИТЬ');
+      tg.SecondaryButton.onClick(function() {
+        if (cart.length === 0) {
+          tg.showAlert('Корзина пуста');
+          return;
+        }
+        
+        tg.showConfirm('Очистить корзину?', function(ok) {
+          if (ok) {
+            cart = [];
+            updateCartBadge();
+            renderCart();
+            tg.showAlert('✅ Корзина очищена');
+          }
+        });
+      });
+    }
+    
+    console.log('✅ Магазин загружен! Пользователь:', user);
+  </script>
+</body>
+</html>
