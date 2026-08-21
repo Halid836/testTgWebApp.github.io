@@ -7,6 +7,9 @@
 </head>
 <body>
   <h1>Shop</h1>
+  
+  <div id="profile" style="text-align: center; margin: 20px 0;"></div>
+  
   <button id="btn" style="padding: 15px 30px; font-size: 18px;">Заказать</button>
   
   <div id="debug" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
@@ -23,15 +26,45 @@
     tg.ready();
     tg.expand();
     
+    const user = tg.initDataUnsafe?.user;
+    const profileDiv = document.getElementById('profile');
+    
+    if (user) {
+      if (user.photo_url) {
+        profileDiv.innerHTML += `
+          <img src="${user.photo_url}" 
+               style="width: 80px; height: 80px; border-radius: 50%;" 
+               onerror="this.style.display='none'">
+        `;
+      }
+      
+      profileDiv.innerHTML += `
+        <h2>${user.first_name}${user.last_name ? ' ' + user.last_name : ''}</h2>
+      `;
+      
+      profileDiv.innerHTML += `
+        <p>User ID: <b>${user.id}</b></p>
+      `;
+      
+      if (user.username) {
+        profileDiv.innerHTML += `<p>@${user.username}</p>`;
+      }
+      
+      debug.innerHTML += '✅ Пользователь найден<br>';
+      debug.innerHTML += `ID: ${user.id}<br>`;
+      debug.innerHTML += `Photo URL: ${user.photo_url || 'Нет фото'}<br>`;
+    } else {
+      profileDiv.innerHTML = '<p>Пользователь не найден</p>';
+      debug.innerHTML += '❌ Пользователь не найден<br>';
+    }
+    
     debug.innerHTML += 'MainButton: ' + (tg.MainButton ? 'Есть' : 'Нет') + '<br>';
     
-    // Кнопка Заказать
     document.getElementById('btn').onclick = function() {
       debug.innerHTML += 'Кнопка нажата!<br>';
       tg.showAlert('Товар оформлен');
     };
     
-    // MainButton
     tg.MainButton.text = 'PAY';
     tg.MainButton.show();
     debug.innerHTML += 'MainButton показана<br>';
