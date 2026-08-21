@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Книга</title>
+  <style>
+    :root {
+      --tg-bg: var(--tg-theme-bg-color, #ffffff);
+      --tg-text: var(--tg-theme-text-color, #000000);
+      --tg-hint: var(--tg-theme-hint-color, #999999);
+      --tg-link: var(--tg-theme-link-color, #2ea6ff);
+      --tg-button: var(--tg-theme-button-color, #2ea6ff);
+      --tg-button-text: var(--tg-theme-button-text-color, #ffffff);
+      --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f0f0f0);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--tg-bg);
+      color: var(--tg-text);
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+    
+    .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+    
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--tg-secondary-bg);
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 10px 15px; z-index: 100;
+    }
+    
+    .nav-btn {
+      background: none; border: none; color: var(--tg-hint); cursor: pointer;
+      font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 10px;
+    }
+    
+    .nav-btn.active { color: var(--tg-link); }
+    .nav-btn-icon { font-size: 24px; }
+    
+    .view { display: none; }
+    .view.active { display: block; }
+    
+    .gacha-banner {
+      background: var(--tg-secondary-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+    
+    .gacha-banner-image {
+      width: 100%; height: 200px; display: flex; align-items: center; justify-content: center;
+      font-size: 80px; color: white; overflow: hidden; position: relative;
+    }
+    
+    .gacha-banner-image img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .gacha-banner-content { padding: 15px; }
+    .gacha-banner-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+    .gacha-banner-description { font-size: 13px; color: var(--tg-hint); margin-bottom: 15px; }
+    
+    .gacha-buttons { display: flex; gap: 10px; }
+    .gacha-btn {
+      flex: 1; padding: 12px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+      display: flex; justify-content: center; align-items: center; gap: 5px;
+    }
+    .gacha-btn:active { opacity: 0.7; }
+    .gacha-btn-1 { background: var(--tg-button); color: var(--tg-button-text); }
+    .gacha-btn-10 { background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%); color: white; }
+    
+    .gacha-btn img { width: 18px; height: 18px; object-fit: contain; }
+    
+    .gacha-result {
+      display: none; margin-top: 15px; padding: 15px;
+      background: var(--tg-bg); border-radius: 12px; text-align: center;
+    }
+    
+    .gacha-result-card { font-size: 60px; margin-bottom: 10px; }
+    .gacha-result-name { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+    .gacha-result-rarity { font-size: 12px; color: var(--tg-hint); }
+    
+    .gacha-result-multi {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    }
+    
+    .gacha-result-item {
+      text-align: center; padding: 10px 5px; background: var(--tg-secondary-bg);
+      border-radius: 8px; display: flex; flex-direction: column; align-items: center; position: relative;
+    }
+    
+    .gacha-result-item img {
+      width: 100px; height: 100px; border-radius: 8px; object-fit: cover; margin-bottom: 5px; display: block;
+    }
+    
+    .gacha-result-item-name {
+      font-size: 10px; color: var(--tg-hint); overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap; margin-top: 5px;
+    }
+    
+    .gacha-result-item.won { border: 3px solid #ffd700; background: rgba(255, 215, 0, 0.1); }
+    .gacha-result-item.lost { border: 3px solid #2196f3; background: rgba(33, 150, 243, 0.05); }
+    
+    .download-btn {
+      margin-top: 15px; padding: 10px 20px;
+      background: var(--tg-button); color: var(--tg-button-text);
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+      width: 100%;
+    }
+    .download-btn:active { opacity: 0.7; }
+    
+    .image-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 300; justify-content: center; align-items: center;
+    }
+    .image-modal img {
+      max-width: 90%; max-height: 80%; border-radius: 10px;
+    }
+    .close-modal-btn {
+      position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.8);
+      border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer;
+    }
+    
+    .wallet-card { background: var(--tg-secondary-bg); border-radius: 16px; padding: 30px 20px; text-align: center; margin-bottom: 15px; }
+    .wallet-icon { font-size: 60px; margin-bottom: 10px; }
+    .wallet-icon img { width: 60px; height: 60px; object-fit: contain; }
+    .wallet-balance { font-size: 40px; font-weight: bold; color: var(--tg-link); }
+    .wallet-label { font-size: 14px; color: var(--tg-hint); }
+    
+    .user-info {
+      background: var(--tg-secondary-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .user-photo {
+      width: 80px; height: 80px; border-radius: 50%;
+      object-fit: cover; border: 3px solid var(--tg-link);
+      margin-bottom: 10px;
+    }
+    .user-name { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+    .user-id { font-size: 13px; color: var(--tg-hint); margin-bottom: 10px; }
+    
+    .banner { background: var(--tg-secondary-bg); border-radius: 16px; overflow: hidden; margin-bottom: 15px; cursor: pointer; }
+    .banner-image { width: 100%; height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 60px; color: white; }
+    .banner-content { padding: 15px; }
+    .banner-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+    .banner-description { font-size: 13px; color: var(--tg-hint); }
+    
+    .expanded-content { display: none; background: var(--tg-secondary-bg); border-radius: 16px; padding: 20px; margin-bottom: 15px; }
+    .chapters-list { display: flex; flex-direction: column; gap: 8px; }
+    .chapter-btn { padding: 12px 15px; background: var(--tg-bg); border: none; border-radius: 12px; color: var(--tg-text); font-size: 14px; cursor: pointer; text-align: left; }
+    .chapter-btn.read::after { content: '✓'; color: #4cd964; float: right; }
+    .chapter-content { display: none; background: var(--tg-bg); border-radius: 12px; padding: 20px; margin-top: 10px; }
+    .close-chapter-btn { padding: 10px 20px; background: var(--tg-button); color: var(--tg-button-text); border: none; border-radius: 10px; font-size: 14px; cursor: pointer; width: 100%; }
+    
+    .reward-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; display: none; margin-top: 15px; }
+    .reward-earned { display: none; text-align: center; padding: 20px; background: var(--tg-secondary-bg); border-radius: 12px; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Вкладка Книги -->
+    <div class="view active" id="booksView">
+      <div class="banner" id="banner">
+        <div class="banner-image">📖</div>
+        <div class="banner-content">
+          <div class="banner-title">Космические приключения</div>
+          <div class="banner-description">Прочитайте все главы и получите 10 билетов!</div>
+        </div>
+      </div>
+      
+      <div class="expanded-content" id="expandedContent">
+        <div class="expanded-title">Космические приключения</div>
+        <div class="expanded-description">Присоединяйтесь к капитану Алексу!</div>
+        
+        <div class="chapters-list">
+          <button class="chapter-btn" data-chapter="1">Глава 1</button>
+          <div class="chapter-content" id="chapter1">
+            <div class="chapter-content-text">Капитан Алекс стоял на мостике корабля...</div>
+            <button class="close-chapter-btn" onclick="closeChapter(1)">Прочитано</button>
+          </div>
+          
+          <button class="chapter-btn" data-chapter="2">Глава 2</button>
+          <div class="chapter-content" id="chapter2">
+            <div class="chapter-content-text">На третий день полёта...</div>
+            <button class="close-chapter-btn" onclick="closeChapter(2)">Прочитано</button>
+          </div>
+          
+          <button class="chapter-btn" data-chapter="3">Глава 3</button>
+          <div class="chapter-content" id="chapter3">
+            <div class="chapter-content-text">Корабль вошёл в туманность...</div>
+            <button class="close-chapter-btn" onclick="closeChapter(3)">Прочитано</button>
+          </div>
+          
+          <button class="chapter-btn" data-chapter="4">Глава 4</button>
+          <div class="chapter-content" id="chapter4">
+            <div class="chapter-content-text">Возвращение домой...</div>
+            <button class="close-chapter-btn" onclick="closeChapter(4)">Прочитано</button>
+          </div>
+        </div>
+        
+        <button class="reward-btn" id="rewardBtn">🎁 ПОЛУЧИТЬ 10 БИЛЕТОВ</button>
+        <div class="reward-earned" id="rewardEarned">+10 билетов!</div>
+      </div>
+    </div>
+    
+    <!-- Вкладка Гача -->
+    <div class="view" id="gachaView">
+      <div class="gacha-banner">
+        <div class="gacha-banner-image" style="background: #f8bbd0;">
+          <img src="photo3.jpg" alt="Баннер Звездной Гачи" onerror="this.style.display='none'; this.parentElement.textContent='🌟';">
+        </div>
+        <div class="gacha-banner-content">
+          <div class="gacha-banner-title">Звёздная гача</div>
+          <div class="gacha-banner-description">Магические аниме девочки</div>
+          <div class="gacha-buttons">
+            <button class="gacha-btn gacha-btn-1" onclick="pullGacha(1, 'stellar')">
+              <img src="coin.png" alt="" onerror="this.style.display='none';"> 1 раз (1 билет)
+            </button>
+            <button class="gacha-btn gacha-btn-10" onclick="pullGacha(10, 'stellar')">
+              <img src="coin.png" alt="" onerror="this.style.display='none';"> 10 раз (10 билетов)
+            </button>
+          </div>
+          <div class="gacha-result" id="stellarResult"></div>
+        </div>
+      </div>
+      
+      <div class="gacha-banner" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <div class="gacha-banner-image">🐉</div>
+        <div class="gacha-banner-content">
+          <div class="gacha-banner-title">Мифическая гача</div>
+          <div class="gacha-banner-description">Легендарные существа</div>
+          <div class="gacha-buttons">
+            <button class="gacha-btn gacha-btn-1" onclick="pullGacha(1, 'mythic')">
+              <img src="coin.png" alt="" onerror="this.style.display='none';"> 1 раз (1 билет)
+            </button>
+            <button class="gacha-btn gacha-btn-10" onclick="pullGacha(10, 'mythic')">
+              <img src="coin.png" alt="" onerror="this.style.display='none';"> 10 раз (10 билетов)
+            </button>
+          </div>
+          <div class="gacha-result" id="mythicResult"></div>
+        </div>
+      </div>
+      
+      <div class="gacha-banner" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <div class="gacha-banner-image">⚔️</div>
+        <div class="gacha-banner-content">
+          <div class="gacha-banner-title">Гача героев</div>
+          <div class="gacha-banner-description">Эпические персонажи</div>
+          <div class="gacha-buttons">
+            <button class="gacha-btn gacha-btn-1" onclick="pullGacha(1, 'hero')">
+              <img src="coin.png" alt="" onerror="this.style.display='none';"> 1 раз (1 билет)
+            </button>
+            <button class="gacha-btn gacha-btn-10" onclick="pullGacha(10, 'hero')">
+              <img src="coin.png" alt="" onerror="this.style.display='none';"> 10 раз (10 билетов)
+            </button>
+          </div>
+          <div class="gacha-result" id="heroResult"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Вкладка Профиль -->
+    <div class="view" id="profileView">
+      <div class="user-info">
+        <img class="user-photo" id="profilePhoto" src="">
+        <div class="user-name" id="profileName"></div>
+        <div class="user-id" id="profileId"></div>
+      </div>
+
+      <div class="wallet-card">
+        <div class="wallet-icon">
+          <img src="coin.png" alt="" onerror="this.style.display='none'; this.parentElement.textContent='👛';">
+        </div>
+        <div class="wallet-balance" id="walletBalance">0</div>
+        <div class="wallet-label">билетов на счету</div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="showView('books')">
+      <span class="nav-btn-icon">📖</span>Книги
+    </button>
+    <button class="nav-btn" onclick="showView('gacha')">
+      <span class="nav-btn-icon">🎰</span>Гача
+    </button>
+    <button class="nav-btn" onclick="showView('profile')">
+      <span class="nav-btn-icon">👤</span>Профиль
+    </button>
+  </div>
+
+  <div class="image-modal" id="imageModal">
+    <button class="close-modal-btn" onclick="closeImageViewer()">×</button>
+    <img id="modalImage" src="">
+    <button class="download-btn" id="downloadBtn" onclick="downloadImage()">📥 Скачать</button>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    
+    const user = tg.initDataUnsafe?.user;
+    const userId = user ? user.id.toString() : 'anonymous';
+    
+    let tickets = 0; // Переименовали яйца в билеты
+    let booksRead = 0;
+    let readChapters = [];
+    let rewardClaimed = false;
+    
+    const gachaCards = {
+      stellar: [
+        { img: 'photo1.jpg', name: 'photo1', rarity: 'Обычная' },
+        { img: 'photo2.jpg', name: 'photo2', rarity: 'Обычная' },
+        { img: 'photo3.jpg', name: 'photo3 (Редкая)', rarity: 'Редкая' }
+      ],
+      mythic: [
+        { icon: '🐉', name: 'Дракон', rarity: 'Эпическая' },
+        { icon: '🦄', name: 'Единорог', rarity: 'Редкая' },
+        { icon: '🧙', name: 'Маг', rarity: 'Обычная' },
+        { icon: '🧝', name: 'Эльф', rarity: 'Редкая' },
+        { icon: '👹', name: 'Демон', rarity: 'Эпическая' }
+      ],
+      hero: [
+        { icon: '⚔️', name: 'Воин', rarity: 'Обычная' },
+        { icon: '🛡️', name: 'Рыцарь', rarity: 'Редкая' },
+        { icon: '🏹', name: 'Лучник', rarity: 'Обычная' },
+        { icon: '🔮', name: 'Маг', rarity: 'Эпическая' },
+        { icon: '👑', name: 'Король', rarity: 'Легендарная' }
+      ]
+    };
+
+    let currentDownloadSrc = '';
+
+    function getRandomCard(cards) {
+      return cards[Math.floor(Math.random() * cards.length)];
+    }
+
+    function downloadImage() {
+      if (!currentDownloadSrc) return;
+      
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = currentDownloadSrc;
+      
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        canvas.toBlob(function(blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'gacha_card.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          tg.showAlert('Карточка скачана!');
+        }, 'image/jpeg');
+      };
+      
+      img.onerror = function() {
+        tg.showAlert('Не удалось загрузить изображение для скачивания.');
+      };
+    }
+
+    function openImageViewer(src) {
+      currentDownloadSrc = src;
+      document.getElementById('modalImage').src = src;
+      document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    function closeImageViewer() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+    
+    function loadData() {
+      if (tg.CloudStorage) {
+        tg.CloudStorage.getItem('tickets', (err, value) => { if (!err && value) tickets = parseInt(value) || 0; updateAll(); });
+        tg.CloudStorage.getItem('booksRead', (err, value) => { if (!err && value) booksRead = parseInt(value) || 0; updateAll(); });
+        tg.CloudStorage.getItem('readChapters', (err, value) => { if (!err && value) readChapters = JSON.parse(value) || []; updateChapters(); });
+        tg.CloudStorage.getItem('rewardClaimed', (err, value) => { if (!err && value) rewardClaimed = value === 'true'; updateChapters(); });
+      } else {
+        tickets = parseInt(localStorage.getItem('tickets') || '0');
+        booksRead = parseInt(localStorage.getItem('booksRead') || '0');
+        readChapters = JSON.parse(localStorage.getItem('readChapters') || '[]');
+        rewardClaimed = localStorage.getItem('rewardClaimed') === 'true';
+        updateAll();
+        updateChapters();
+      }
+    }
+    
+    function saveData() {
+      if (tg.CloudStorage) {
+        tg.CloudStorage.setItem('tickets', tickets.toString());
+        tg.CloudStorage.setItem('booksRead', booksRead.toString());
+        tg.CloudStorage.setItem('readChapters', JSON.stringify(readChapters));
+        tg.CloudStorage.setItem('rewardClaimed', rewardClaimed.toString());
+      } else {
+        localStorage.setItem('tickets', tickets.toString());
+        localStorage.setItem('booksRead', booksRead.toString());
+        localStorage.setItem('readChapters', JSON.stringify(readChapters));
+        localStorage.setItem('rewardClaimed', rewardClaimed.toString());
+      }
+    }
+    
+    function updateAll() {
+      document.getElementById('walletBalance').textContent = tickets;
+      
+      if (user) {
+        document.getElementById('profilePhoto').src = user.photo_url || 'https://via.placeholder.com/80';
+        document.getElementById('profileName').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        document.getElementById('profileId').textContent = 'ID: ' + user.id;
+      }
+    }
+    
+    function showView(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(view + 'View').classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      if (event && event.target.closest('.nav-btn')) {
+        event.target.closest('.nav-btn').classList.add('active');
+      }
+      
+      updateAll();
+    }
+    
+    function pullGacha(count, type) {
+      const cost = count;
+      if (tickets < cost) {
+        tg.showAlert('Недостаточно билетов!');
+        return;
+      }
+      
+      tickets -= cost;
+      saveData();
+      updateAll();
+      
+      const resultDiv = document.getElementById(type + 'Result');
+      const cards = gachaCards[type];
+      
+      if (type === 'stellar') {
+        if (count === 1) {
+          const card = getRandomCard(cards);
+          
+          const isMainCard = card.img === 'photo3.jpg'; 
+          const borderColor = isMainCard ? '#ffd700' : '#2196f3';
+          const statusText = isMainCard ? 'Выпало!' : 'Не выпало';
+          
+          resultDiv.innerHTML = `
+            <div class="gacha-result-card">
+              <img src="${card.img}" style="width:100%; border-radius:10px; border: 3px solid ${borderColor}; cursor: pointer;" alt="${card.name}" onclick="openImageViewer('${card.img}')" onerror="this.style.display='none'; this.parentElement.innerHTML='${card.icon || '❓'}';">
+            </div>
+            <div class="gacha-result-name">${card.name}</div>
+            <div class="gacha-result-rarity" style="color:${borderColor};">${statusText} ${card.rarity}</div>
+            <button class="download-btn" onclick="openImageViewer('${card.img}')">📥 Скачать</button>
+          `;
+        } else {
+          let html = '<div class="gacha-result-multi">';
+          for (let i = 0; i < 10; i++) {
+            const card = getRandomCard(cards);
+            const isMainCard = card.img === 'photo3.jpg';
+            const borderColor = isMainCard ? '#ffd700' : '#2196f3';
+            const statusClass = isMainCard ? 'won' : 'lost';
+            
+            html += `
+              <div class="gacha-result-item ${statusClass}">
+                <img src="${card.img}" style="width: 80px; height: 80px; border-radius:8px; border: 3px solid ${borderColor}; cursor: pointer;" alt="${card.name}" onclick="openImageViewer('${card.img}')" onerror="this.style.display='none'; this.parentElement.innerHTML='${card.icon || '❓'}';">
+                <div class="gacha-result-item-name">${card.name}</div>
+              </div>
+            `;
+          }
+          html += '</div>';
+          resultDiv.innerHTML = html;
+        }
+        
+      } else {
+        if (count === 1) {
+          const card = cards[Math.floor(Math.random() * cards.length)];
+          resultDiv.innerHTML = `
+            <div class="gacha-result-card">${card.icon}</div>
+            <div class="gacha-result-name">${card.name}</div>
+            <div class="gacha-result-rarity">${card.rarity}</div>
+          `;
+        } else {
+          let html = '<div class="gacha-result-multi">';
+          for (let i = 0; i < 10; i++) {
+            const card = cards[Math.floor(Math.random() * cards.length)];
+            html += `
+              <div class="gacha-result-item">
+                <div class="gacha-result-item-icon" style="font-size:30px;">${card.icon}</div>
+                <div class="gacha-result-item-name">${card.name}</div>
+              </div>
+            `;
+          }
+          html += '</div>';
+          resultDiv.innerHTML = html;
+        }
+      }
+      
+      resultDiv.style.display = 'block';
+      tg.HapticFeedback.notificationOccurred('success');
+    }
+    
+    function updateChapters() {
+      document.querySelectorAll('.chapter-btn').forEach(btn => {
+        const chapterNum = parseInt(btn.dataset.chapter);
+        if (readChapters.includes(chapterNum)) btn.classList.add('read');
+      });
+      if (readChapters.length === 4 && !rewardClaimed) {
+        document.getElementById('rewardBtn').style.display = 'block';
+      }
+      if (rewardClaimed) {
+        document.getElementById('rewardEarned').style.display = 'block';
+      }
+    }
+    
+    window.closeChapter = function(chapterNum) {
+      document.getElementById(`chapter${chapterNum}`).style.display = 'none';
+      if (!readChapters.includes(chapterNum)) {
+        readChapters.push(chapterNum);
+        saveData();
+      }
+      updateChapters();
+    };
+    
+    document.querySelectorAll('.chapter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chapter-content').forEach(c => c.style.display = 'none');
+        document.getElementById('chapter' + btn.dataset.chapter).style.display = 'block';
+      });
+    });
+    
+    document.getElementById('banner').addEventListener('click', () => {
+      document.getElementById('expandedContent').style.display = 'block';
+      document.getElementById('banner').style.display = 'none';
+    });
+    
+    document.getElementById('rewardBtn').addEventListener('click', () => {
+      rewardClaimed = true;
+      tickets += 10;
+      booksRead += 1;
+      saveData();
+      updateAll();
+      document.getElementById('rewardBtn').style.display = 'none';
+      document.getElementById('rewardEarned').style.display = 'block';
+      tg.showAlert('+10 билетов! 🎟️');
+    });
+    
+    loadData();
+  </script>
+</body>
+                                                         </html>
