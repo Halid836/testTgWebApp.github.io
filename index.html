@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SpaceNote</title>
+  <title>Заметки</title>
   <style>
+    :root {
+      --tg-bg: var(--tg-theme-bg-color, #ffffff);
+      --tg-text: var(--tg-theme-text-color, #000000);
+      --tg-hint: var(--tg-theme-hint-color, #999999);
+      --tg-link: var(--tg-theme-link-color, #2ea6ff);
+      --tg-button: var(--tg-theme-button-color, #2ea6ff);
+      --tg-button-text: var(--tg-theme-button-text-color, #ffffff);
+      --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f0f0f0);
+    }
+    
     * {
       margin: 0;
       padding: 0;
@@ -13,392 +23,97 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%);
+      background: var(--tg-bg);
+      color: var(--tg-text);
       min-height: 100vh;
-      color: white;
-      overflow-x: hidden;
-    }
-    
-    .stars {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
-    
-    .star {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 3s infinite;
-    }
-    
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.5); }
+      padding: 15px;
     }
     
     .container {
-      position: relative;
-      z-index: 1;
       max-width: 500px;
       margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .profile-section {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 20px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 20px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-    }
-    
-    .profile-photo {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px solid #667eea;
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-    }
-    
-    .profile-info {
-      flex: 1;
-    }
-    
-    .profile-name {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    
-    .profile-id {
-      font-size: 12px;
-      color: #a8a8b3;
+      padding-bottom: 80px;
     }
     
     .header {
       text-align: center;
-      margin-bottom: 30px;
-      padding-top: 20px;
-    }
-    
-    .logo {
-      font-size: 32px;
-      font-weight: bold;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: glow 3s infinite;
-    }
-    
-    @keyframes glow {
-      0%, 100% { filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5)); }
-      50% { filter: drop-shadow(0 0 25px rgba(118, 75, 162, 0.8)); }
-    }
-    
-    .subtitle {
-      font-size: 14px;
-      color: #a8a8b3;
-      margin-top: 5px;
-    }
-    
-    .input-container {
-      margin-bottom: 20px;
-    }
-    
-    .note-input {
-      width: 100%;
-      padding: 15px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: white;
-      font-size: 16px;
-      resize: vertical;
-      min-height: 100px;
-      transition: all 0.3s;
-      backdrop-filter: blur(10px);
-    }
-    
-    .note-input:focus {
-      outline: none;
-      border-color: #667eea;
-      background: rgba(255,255,255,0.08);
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-    }
-    
-    .note-input::placeholder {
-      color: #a8a8b3;
-    }
-    
-    .btn-add {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 10px;
-    }
-    
-    .btn-add:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-add:active {
-      transform: translateY(0);
-    }
-    
-    .filters {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      padding: 5px;
-    }
-    
-    .filter-btn {
-      padding: 8px 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      color: #a8a8b3;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.3s;
-    }
-    
-    .filter-btn.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-color: transparent;
+      margin-bottom: 15px;
+      font-size: 20px;
+      font-weight: 600;
     }
     
     .notes-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     
     .note-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 15px;
-      padding: 15px;
-      transition: all 0.3s;
+      background: var(--tg-secondary-bg);
+      border-radius: 12px;
+      padding: 12px;
       cursor: pointer;
-      backdrop-filter: blur(10px);
-      position: relative;
-      overflow: hidden;
+      transition: transform 0.2s;
     }
     
-    .note-card:hover {
-      background: rgba(255,255,255,0.08);
-      transform: translateX(5px);
-      border-color: #667eea;
-    }
-    
-    .note-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .note-card:hover::before {
-      opacity: 1;
+    .note-card:active {
+      transform: scale(0.98);
     }
     
     .note-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
     
     .note-date {
-      font-size: 12px;
-      color: #a8a8b3;
-    }
-    
-    .note-category {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      background: rgba(102, 126, 234, 0.2);
-      color: #667eea;
+      font-size: 11px;
+      color: var(--tg-hint);
     }
     
     .note-text {
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.4;
       word-break: break-word;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
     
     .note-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       justify-content: flex-end;
     }
     
     .note-action-btn {
-      padding: 5px 10px;
+      padding: 4px 8px;
       background: none;
       border: none;
-      color: #a8a8b3;
+      color: var(--tg-hint);
       cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .note-action-btn:active {
+      color: var(--tg-text);
+    }
+    
+    .note-action-btn.delete:active {
+      color: #ff3b30;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--tg-hint);
       font-size: 14px;
-      transition: all 0.3s;
-    }
-    
-    .note-action-btn:hover {
-      color: white;
-    }
-    
-    .note-action-btn.delete:hover {
-      color: #ff6b6b;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-    }
-    
-    .modal-content {
-      background: #1a1a3e;
-      border-radius: 20px;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    
-    .modal-title {
-      font-size: 20px;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    
-    .category-select {
-      width: 100%;
-      padding: 10px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: white;
-      margin-bottom: 15px;
-    }
-    
-    .category-select option {
-      background: #1a1a3e;
-    }
-    
-    .stats {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 15px;
-    }
-    
-    .stat-item {
-      text-align: center;
-    }
-    
-    .stat-number {
-      font-size: 24px;
-      font-weight: bold;
-      color: #667eea;
-    }
-    
-    .stat-label {
-      font-size: 12px;
-      color: #a8a8b3;
     }
   </style>
 </head>
 <body>
-  <div class="stars" id="stars"></div>
-  
   <div class="container">
-    <div class="profile-section" id="profileSection"></div>
-    
-    <div class="header">
-      <div class="logo">SpaceNote</div>
-      <div class="subtitle">Ваша личная галактика заметок</div>
-    </div>
-    
-    <div class="stats">
-      <div class="stat-item">
-        <div class="stat-number" id="totalNotes">0</div>
-        <div class="stat-label">Всего заметок</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" id="todayNotes">0</div>
-        <div class="stat-label">Сегодня</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" id="starredNotes">0</div>
-        <div class="stat-label">Избранных</div>
-      </div>
-    </div>
-    
-    <div class="input-container">
-      <textarea class="note-input" id="noteInput" placeholder="Напишите вашу мысль..."></textarea>
-      <button class="btn-add" id="addBtn">✨ Создать звезду</button>
-    </div>
-    
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">Все</button>
-      <button class="filter-btn" data-filter="ideas">💡 Идеи</button>
-      <button class="filter-btn" data-filter="tasks">📋 Задачи</button>
-      <button class="filter-btn" data-filter="dreams">🌙 Мечты</button>
-      <button class="filter-btn" data-filter="starred">⭐ Избранные</button>
-    </div>
-    
+    <div class="header">📝 Заметки</div>
     <div class="notes-list" id="notesList"></div>
-  </div>
-  
-  <div class="modal" id="categoryModal">
-    <div class="modal-content">
-      <div class="modal-title">Выберите категорию</div>
-      <select class="category-select" id="categorySelect">
-        <option value="ideas">💡 Идея</option>
-        <option value="tasks">📋 Задача</option>
-        <option value="dreams">🌙 Мечта</option>
-      </select>
-      <button class="btn-add" id="saveCategoryBtn">Сохранить</button>
-      <button class="btn-add" id="cancelCategoryBtn" style="background: rgba(255,255,255,0.1); margin-top: 10px;">Отмена</button>
-    </div>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -407,55 +122,15 @@
     tg.ready();
     tg.expand();
     
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 150; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.width = Math.random() * 3 + 'px';
-      star.style.height = star.style.width;
-      star.style.animationDelay = Math.random() * 3 + 's';
-      starsContainer.appendChild(star);
-    }
-    
     const user = tg.initDataUnsafe?.user;
     const userId = user ? user.id : 'anonymous';
-    const profileSection = document.getElementById('profileSection');
     
-    if (user) {
-      profileSection.innerHTML = `
-        <img src="${user.photo_url || 'https://via.placeholder.com/60'}" 
-             class="profile-photo" 
-             onerror="this.src='https://via.placeholder.com/60'">
-        <div class="profile-info">
-          <div class="profile-name">${user.first_name}${user.last_name ? ' ' + user.last_name : ''}</div>
-          <div class="profile-id">User ID: ${user.id}</div>
-          ${user.username ? `<div class="profile-id">@${user.username}</div>` : ''}
-        </div>
-      `;
-    } else {
-      profileSection.innerHTML = '<div class="profile-info">Пользователь не найден</div>';
-    }
-    
-    let notes = JSON.parse(localStorage.getItem(`spacenote_${userId}`) || '[]');
-    let currentFilter = 'all';
-    let pendingNoteText = '';
+    let notes = JSON.parse(localStorage.getItem(`notes_${userId}`) || '[]');
     
     function saveNotes() {
-      localStorage.setItem(`spacenote_${userId}`, JSON.stringify(notes));
-      updateStats();
+      localStorage.setItem(`notes_${userId}`, JSON.stringify(notes));
       renderNotes();
-    }
-    
-    function updateStats() {
-      const today = new Date().toDateString();
-      const todayNotes = notes.filter(note => new Date(note.date).toDateString() === today).length;
-      const starredNotes = notes.filter(note => note.starred).length;
-      
-      document.getElementById('totalNotes').textContent = notes.length;
-      document.getElementById('todayNotes').textContent = todayNotes;
-      document.getElementById('starredNotes').textContent = starredNotes;
+      updateMainButton();
     }
     
     function formatDate(dateString) {
@@ -478,60 +153,25 @@
     
     function renderNotes() {
       const notesList = document.getElementById('notesList');
-      let filteredNotes = notes;
       
-      if (currentFilter === 'starred') {
-        filteredNotes = notes.filter(note => note.starred);
-      } else if (currentFilter !== 'all') {
-        filteredNotes = notes.filter(note => note.category === currentFilter);
-      }
-      
-      filteredNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      if (filteredNotes.length === 0) {
-        notesList.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: #a8a8b3;">
-            <div style="font-size: 48px; margin-bottom: 15px;">🌌</div>
-            <p>Здесь пока пусто</p>
-            <p style="font-size: 12px; margin-top: 5px;">Создайте свою первую звезду</p>
-          </div>
-        `;
+      if (notes.length === 0) {
+        notesList.innerHTML = '<div class="empty-state">Нет заметок</div>';
         return;
       }
       
-      notesList.innerHTML = filteredNotes.map(note => `
+      notes.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      notesList.innerHTML = notes.map(note => `
         <div class="note-card">
           <div class="note-header">
             <span class="note-date">${formatDate(note.date)}</span>
-            <span class="note-category">${getCategoryEmoji(note.category)} ${getCategoryName(note.category)}</span>
           </div>
           <div class="note-text">${escapeHtml(note.text)}</div>
           <div class="note-actions">
-            <button class="note-action-btn" onclick="toggleStar(${note.id})">
-              ${note.starred ? '⭐' : '☆'}
-            </button>
-            <button class="note-action-btn delete" onclick="deleteNote(${note.id})">🗑</button>
+            <button class="note-action-btn" onclick="deleteNote(${note.id})">🗑</button>
           </div>
         </div>
       `).join('');
-    }
-    
-    function getCategoryEmoji(category) {
-      const emojis = {
-        ideas: '💡',
-        tasks: '📋',
-        dreams: '🌙'
-      };
-      return emojis[category] || '📝';
-    }
-    
-    function getCategoryName(category) {
-      const names = {
-        ideas: 'Идея',
-        tasks: 'Задача',
-        dreams: 'Мечта'
-      };
-      return names[category] || 'Заметка';
     }
     
     function escapeHtml(text) {
@@ -540,82 +180,54 @@
       return div.innerHTML;
     }
     
-    function addNote() {
-      const text = document.getElementById('noteInput').value.trim();
-      if (!text) {
-        tg.showAlert('Напишите текст заметки');
-        return;
-      }
-      
-      pendingNoteText = text;
-      document.getElementById('categoryModal').style.display = 'flex';
-    }
-    
     window.deleteNote = function(id) {
       tg.showConfirm('Удалить заметку?', (confirmed) => {
         if (confirmed) {
           notes = notes.filter(note => note.id !== id);
           saveNotes();
-          tg.showAlert('Заметка удалена');
         }
       });
     };
     
-    window.toggleStar = function(id) {
-      const note = notes.find(n => n.id === id);
-      if (note) {
-        note.starred = !note.starred;
-        saveNotes();
-        
-        if (note.starred) {
-          tg.HapticFeedback.notificationOccurred('success');
+    function createNote() {
+      tg.showPopup({
+        title: 'Новая заметка',
+        message: 'Введите текст',
+        buttons: [
+          { id: 'cancel', type: 'cancel', text: 'Отмена' },
+          { id: 'ok', type: 'default', text: 'Сохранить' }
+        ]
+      }, (buttonId) => {
+        if (buttonId === 'ok') {
+          const text = prompt('Введите текст заметки:');
+          if (text && text.trim()) {
+            const note = {
+              id: Date.now(),
+              text: text.trim(),
+              date: new Date().toISOString()
+            };
+            notes.unshift(note);
+            saveNotes();
+            tg.HapticFeedback.notificationOccurred('success');
+          }
         }
-      }
-    };
-    
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
-        renderNotes();
       });
-    });
+    }
     
-    document.getElementById('addBtn').addEventListener('click', addNote);
-    
-    document.getElementById('noteInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.ctrlKey) {
-        addNote();
+    function updateMainButton() {
+      if (notes.length === 0) {
+        tg.MainButton.setText('СОЗДАТЬ ЗАМЕТКУ');
+        tg.MainButton.show();
+      } else {
+        tg.MainButton.setText('НОВАЯ ЗАМЕТКА');
+        tg.MainButton.show();
       }
-    });
+    }
     
-    document.getElementById('saveCategoryBtn').addEventListener('click', () => {
-      const category = document.getElementById('categorySelect').value;
-      const note = {
-        id: Date.now(),
-        text: pendingNoteText,
-        date: new Date().toISOString(),
-        category: category,
-        starred: false
-      };
-      
-      notes.unshift(note);
-      saveNotes();
-      
-      document.getElementById('noteInput').value = '';
-      document.getElementById('categoryModal').style.display = 'none';
-      
-      tg.HapticFeedback.notificationOccurred('success');
-      tg.showAlert('Звезда создана! ✨');
-    });
+    tg.MainButton.onClick(createNote);
     
-    document.getElementById('cancelCategoryBtn').addEventListener('click', () => {
-      document.getElementById('categoryModal').style.display = 'none';
-    });
-    
-    updateStats();
     renderNotes();
+    updateMainButton();
   </script>
 </body>
 </html>
